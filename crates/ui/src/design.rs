@@ -394,6 +394,19 @@ pub fn builtin_colors(dark: bool, variant: Variant) -> Palette {
 		Variant::Afterglow => gradient([0xd9663c, 0x35205e], 0x5b3b40),
 		Variant::Aurora => {
 			let mut p = gradient([0x123d38, 0x21183f], 0x31504f);
+			// Keep the glass surfaces distinct instead of laying identical black panes
+			// over the backdrop. The green rail and violet conversation edge make the
+			// three-column layout legible while preserving the aurora underneath.
+			p.base = rgba(0x081b1b, 190);
+			p.sidebar = rgba(0x0b2025, 202);
+			p.chat = rgba(0x11182a, 188);
+			p.raised = rgba(0x1b2938, 222);
+			p.hover = rgba(0x65e6c4, 28);
+			p.selected = rgba(0x65e6c4, 48);
+			p.border = rgb(0x31504f);
+			p.text_strong = rgb(0xf0fbf8);
+			p.text = rgb(0xd4e7e4);
+			p.muted = rgb(0x9db9b7);
 			p.accent = rgb(0x62e6c4);
 			p.link = rgb(0x8bdcff);
 			p.positive = rgb(0x62d6a8);
@@ -3429,4 +3442,17 @@ mod sign_in_widget_tests {
 		}
 		set_extension_theme(None);
 	}
+	#[test]
+	fn aurora_uses_layered_translucent_glass_and_cyan_accents() {
+		let palette = builtin_colors(true, Variant::Aurora);
+		assert!(palette.backdrop.is_some());
+		assert!(palette.base.a() < 255);
+		assert!(palette.sidebar.a() < 255);
+		assert!(palette.chat.a() < 255);
+		assert!(palette.raised.a() < 255);
+		assert_ne!(palette.sidebar, palette.chat);
+		assert_eq!(palette.accent, rgb(0x62e6c4));
+		assert_eq!(palette.link, rgb(0x8bdcff));
+	}
+
 }
