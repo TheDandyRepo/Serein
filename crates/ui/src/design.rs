@@ -91,6 +91,8 @@ pub enum Variant {
 	Ember = 4,
 	Verdant = 5,
 	Afterglow = 6,
+	/// Dark glass surfaces with an emerald, cyan and violet aurora.
+	Aurora = 7,
 }
 impl Variant {
 	pub const ALL: [Variant; 7] = [
@@ -101,6 +103,7 @@ impl Variant {
 		Variant::Ember,
 		Variant::Verdant,
 		Variant::Afterglow,
+		Variant::Aurora,
 	];
 	pub fn label(self) -> &'static str {
 		match self {
@@ -111,6 +114,7 @@ impl Variant {
 			Variant::Ember => "Ember",
 			Variant::Verdant => "Verdant",
 			Variant::Afterglow => "Afterglow",
+			Variant::Aurora => "Aurora",
 		}
 	}
 	/// Stable identifier for persistence.
@@ -123,6 +127,7 @@ impl Variant {
 			Variant::Ember => "ember",
 			Variant::Verdant => "verdant",
 			Variant::Afterglow => "afterglow",
+			Variant::Aurora => "aurora",
 		}
 	}
 	/// Keys written by builds that shipped the previous theme names.
@@ -135,6 +140,7 @@ impl Variant {
 			Variant::Ember => "crimson-moon",
 			Variant::Verdant => "forest",
 			Variant::Afterglow => "sunset",
+			Variant::Aurora => "aurora",
 		}
 	}
 	pub fn from_key(key: &str) -> Option<Variant> {
@@ -146,7 +152,7 @@ impl Variant {
 	pub fn is_gradient(self) -> bool {
 		matches!(
 			self,
-			Variant::Nightfall | Variant::Ember | Variant::Verdant | Variant::Afterglow
+			Variant::Nightfall | Variant::Ember | Variant::Verdant | Variant::Afterglow | Variant::Aurora
 		)
 	}
 	fn from_u8(value: u8) -> Variant {
@@ -386,6 +392,15 @@ pub fn builtin_colors(dark: bool, variant: Variant) -> Palette {
 		Variant::Ember => gradient([0x8c2340, 0x140609], 0x41262e),
 		Variant::Verdant => gradient([0x2b6350, 0x081a15], 0x283934),
 		Variant::Afterglow => gradient([0xd9663c, 0x35205e], 0x5b3b40),
+		Variant::Aurora => {
+			let mut p = gradient([0x123d38, 0x21183f], 0x31504f);
+			p.accent = rgb(0x62e6c4);
+			p.link = rgb(0x8bdcff);
+			p.positive = rgb(0x62d6a8);
+			p.mention_bg = rgba(0x62e6c4, 76);
+			p.mention_text = rgb(0xbaf8e8);
+			p
+		},
 	};
 	customize(palette, primary_color())
 }
