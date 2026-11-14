@@ -95,7 +95,7 @@ pub enum Variant {
 	Aurora = 7,
 }
 impl Variant {
-	pub const ALL: [Variant; 7] = [
+	pub const ALL: [Variant; 8] = [
 		Variant::Standard,
 		Variant::Eclipse,
 		Variant::Slate,
