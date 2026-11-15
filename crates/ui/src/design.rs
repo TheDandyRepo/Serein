@@ -671,14 +671,27 @@ pub fn glass(ui: &egui::Ui, color: Color32) -> (Color32, Stroke) {
 }
 
 /// The faint edge that outlines glass and see-through cards.
+fn hairline_color(dark: bool, variant: Variant, accent: Color32) -> Color32 {
+	if variant == Variant::Aurora {
+		// A restrained accent edge gives translucent panes definition without turning
+		// every surface into a bright outline. Keep the user's custom accent in sync.
+		Color32::from_rgba_unmultiplied(accent.r(), accent.g(), accent.b(), 28)
+	} else if dark {
+		Color32::from_white_alpha(18)
+	} else {
+		Color32::from_black_alpha(18)
+	}
+}
 fn hairline(ui: &egui::Ui) -> Stroke {
+	let variant = variant();
+	let accent = if variant == Variant::Aurora {
+		palette(ui).accent
+	} else {
+		Color32::TRANSPARENT
+	};
 	Stroke::new(
 		1.0,
-		if ui.visuals().dark_mode {
-			Color32::from_white_alpha(18)
-		} else {
-			Color32::from_black_alpha(18)
-		},
+		hairline_color(ui.visuals().dark_mode, variant, accent),
 	)
 }
 
@@ -3453,6 +3466,23 @@ mod sign_in_widget_tests {
 		assert_ne!(palette.sidebar, palette.chat);
 		assert_eq!(palette.accent, rgb(0x62e6c4));
 		assert_eq!(palette.link, rgb(0x8bdcff));
+	}
+
+	#[test]
+	fn aurora_glass_edges_follow_the_active_accent() {
+		let accent = rgb(0x62e6c4);
+		assert_eq!(
+			hairline_color(true, Variant::Aurora, accent),
+			Color32::from_rgba_unmultiplied(0x62, 0xe6, 0xc4, 28),
+		);
+		assert_eq!(
+			hairline_color(true, Variant::Standard, accent),
+			Color32::from_white_alpha(18),
+		);
+		assert_eq!(
+			hairline_color(false, Variant::Standard, accent),
+			Color32::from_black_alpha(18),
+		);
 	}
 
 }
