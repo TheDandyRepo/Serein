@@ -197,8 +197,19 @@ pub(super) fn rail_indicator(
 		egui::pos2(rect.left() - f32::from(RAIL_MARGIN) + 1.0, rect.center().y),
 		egui::vec2(8.0, height),
 	);
-	ui.painter()
-		.rect_filled(pill, 4, design::palette(ui).text_strong);
+	let colors = design::palette(ui);
+	let color = rail_indicator_color(design::variant(), &colors);
+	ui.painter().rect_filled(pill, 4, color);
+}
+
+/// Aurora uses its cyan accent for selected navigation; established presets keep the
+/// high-contrast text marker they have always used.
+fn rail_indicator_color(variant: design::Variant, colors: &design::Palette) -> Color32 {
+	if variant == design::Variant::Aurora {
+		colors.accent
+	} else {
+		colors.text_strong
+	}
 }
 /// Mention badge that pops in when `count` first becomes non-zero.
 pub(super) fn rail_badge(ui: &egui::Ui, id: egui::Id, rect: egui::Rect, count: u32, ring: Color32) {
@@ -501,6 +512,20 @@ mod tests {
 			generation: state.generation,
 			event,
 		});
+	}
+
+	#[test]
+	fn aurora_rail_selection_uses_its_accent_and_other_presets_keep_the_text_marker() {
+		let mut aurora = design::builtin_colors(true, design::Variant::Aurora);
+		let custom = Color32::from_rgb(0x75, 0xd9, 0xff);
+		aurora.accent = custom;
+		assert_eq!(rail_indicator_color(design::Variant::Aurora, &aurora), custom);
+
+		let standard = design::builtin_colors(true, design::Variant::Standard);
+		assert_eq!(
+			rail_indicator_color(design::Variant::Standard, &standard),
+			standard.text_strong,
+		);
 	}
 
 	#[test]
