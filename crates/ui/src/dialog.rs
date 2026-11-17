@@ -39,9 +39,11 @@ pub enum Tone {
 /// The standard dialog surface: raised fill, hairline border, shadow and no inner margin so
 /// the footer can run the full width.
 pub fn frame(ctx: &egui::Context) -> egui::Frame {
+	let variant = design::variant();
 	let colors = design::palette_for(ctx);
+	let window = design::colors(ctx.theme() == egui::Theme::Dark, variant);
 	egui::Frame::new()
-		.fill(colors.chat.to_opaque())
+		.fill(design::modal_surface(variant, colors.chat, window.chat))
 		.stroke(Stroke::new(1.0, colors.border))
 		.corner_radius(RADIUS)
 		.shadow(ctx.style_of(ctx.theme()).visuals.window_shadow)
@@ -229,10 +231,12 @@ impl Body<'_> {
 	/// strip lays its children out from the right edge.
 	pub fn footer<R>(&mut self, add: impl FnOnce(&mut egui::Ui) -> R) -> R {
 		self.footer_drawn = true;
+		let variant = design::variant();
 		let colors = design::palette(self.ui);
+		let window = design::window_palette(self.ui);
 		self.ui.add_space(PAD - 8.0);
 		egui::Frame::new()
-			.fill(colors.sidebar.to_opaque())
+			.fill(design::modal_surface(variant, colors.sidebar, window.sidebar))
 			.stroke(Stroke::new(1.0, colors.border))
 			.corner_radius(egui::CornerRadius {
 				nw: 0,
@@ -306,7 +310,9 @@ impl SettingsShell {
 		mut add: impl FnMut(&mut egui::Ui, ShellRegion),
 	) -> bool {
 		let Self { id, save_bar } = self;
+		let variant = design::variant();
 		let colors = design::palette_for(ctx);
+		let window = design::colors(ctx.theme() == egui::Theme::Dark, variant);
 		let size = ctx.content_rect().size();
 		let width = (size.x - 32.0).clamp(260.0, 1160.0);
 		let height = (size.y - 32.0).max(220.0);
@@ -327,7 +333,7 @@ impl SettingsShell {
 						.show_separator_line(false)
 						.frame(
 							egui::Frame::new()
-								.fill(colors.sidebar.to_opaque())
+								.fill(design::modal_surface(variant, colors.sidebar, window.sidebar))
 								.corner_radius(egui::CornerRadius {
 									nw: RADIUS,
 									sw: RADIUS,
@@ -395,9 +401,11 @@ impl SettingsShell {
 
 /// Floating card around one unsaved-changes bar inside a [`SettingsShell`].
 pub fn save_bar_frame(ctx: &egui::Context) -> egui::Frame {
+	let variant = design::variant();
 	let colors = design::palette_for(ctx);
+	let window = design::colors(ctx.theme() == egui::Theme::Dark, variant);
 	egui::Frame::new()
-		.fill(colors.base.to_opaque())
+		.fill(design::modal_surface(variant, colors.base, window.base))
 		.stroke(Stroke::new(1.0, colors.border))
 		.corner_radius(10)
 		.shadow(ctx.style_of(ctx.theme()).visuals.window_shadow)

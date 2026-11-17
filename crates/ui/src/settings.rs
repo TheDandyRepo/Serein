@@ -323,7 +323,9 @@ impl MessagingUi {
 		state: &mut State,
 		commands: &mut Vec<client_core::Command>,
 	) {
+		let variant = design::variant();
 		let colors = design::palette_for(ctx);
+		let window = design::colors(ctx.theme() == egui::Theme::Dark, variant);
 		let size = ctx.content_rect().size() - egui::vec2(32.0, 40.0);
 		let width = size.x.clamp(280.0, 1100.0);
 		let height = size.y.clamp(240.0, 820.0);
@@ -332,7 +334,7 @@ impl MessagingUi {
 			.backdrop_color(egui::Color32::from_black_alpha(180))
 			.frame(
 				egui::Frame::new()
-					.fill(colors.chat.to_opaque())
+					.fill(design::modal_surface(variant, colors.chat, window.chat))
 					.corner_radius(crate::dialog::RADIUS)
 					.shadow(ctx.style_of(ctx.theme()).visuals.window_shadow)
 					.stroke(egui::Stroke::new(1.0, colors.border)),
@@ -346,7 +348,7 @@ impl MessagingUi {
 						.resizable(false)
 						.frame(
 							egui::Frame::new()
-								.fill(colors.sidebar.to_opaque())
+								.fill(design::modal_surface(variant, colors.sidebar, window.sidebar))
 								.corner_radius(egui::CornerRadius {
 									nw: crate::dialog::RADIUS,
 									sw: crate::dialog::RADIUS,

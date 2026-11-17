@@ -964,6 +964,16 @@ pub(crate) fn control_colors(dark: bool, variant: Variant) -> Palette {
 pub fn window_palette(ui: &egui::Ui) -> Palette {
 	colors(ui.visuals().dark_mode, variant())
 }
+
+/// Modal chrome follows the same material as the main window: glass presets retain their
+/// translucent coat, while flat presets keep the already-composited opaque control surface.
+pub fn modal_surface(variant: Variant, controls: Color32, window: Color32) -> Color32 {
+	if variant.is_gradient() {
+		window
+	} else {
+		controls.to_opaque()
+	}
+}
 /// Composite surface fills while preserving theme tokens for each consumer's own background.
 fn opaque_surfaces(mut palette: Palette) -> Palette {
 	let backdrop = palette
@@ -3482,6 +3492,22 @@ mod sign_in_widget_tests {
 		assert_eq!(
 			hairline_color(false, Variant::Standard, accent),
 			Color32::from_black_alpha(18),
+		);
+	}
+
+	#[test]
+	fn modal_surfaces_keep_glass_for_gradient_presets_and_opaque_fills_for_flat_presets() {
+		let controls = Color32::from_rgba_unmultiplied(0x20, 0x30, 0x40, 80);
+		let window = Color32::from_rgba_unmultiplied(0x20, 0x30, 0x40, 188);
+		assert_eq!(modal_surface(Variant::Aurora, controls, window), window);
+		assert_eq!(modal_surface(Variant::Nightfall, controls, window), window);
+		assert_eq!(
+			modal_surface(Variant::Standard, controls, window),
+			controls.to_opaque(),
+		);
+		assert_eq!(
+			modal_surface(Variant::Slate, controls, window),
+			controls.to_opaque(),
 		);
 	}
 
