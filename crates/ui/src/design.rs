@@ -974,6 +974,33 @@ pub fn modal_surface(variant: Variant, controls: Color32, window: Color32) -> Co
 		controls.to_opaque()
 	}
 }
+
+/// Geometry and tint for the active channel marker. Flat presets keep their established
+/// selection treatment; Aurora adds a compact accent rail to make the current destination
+/// easier to scan in a dense channel list.
+fn active_channel_marker(
+	variant: Variant,
+	row: egui::Rect,
+	accent: Color32,
+) -> Option<(egui::Rect, Color32)> {
+	if variant != Variant::Aurora {
+		return None;
+	}
+	Some((
+		egui::Rect::from_center_size(
+			egui::pos2(row.left() + 4.0, row.center().y),
+			egui::vec2(4.0, 18.0),
+		),
+		accent,
+	))
+}
+
+/// Paint the Aurora-only accent marker inside an active channel row.
+pub(crate) fn paint_active_channel_marker(ui: &egui::Ui, row: egui::Rect) {
+	if let Some((marker, color)) = active_channel_marker(variant(), row, palette(ui).accent) {
+		ui.painter().rect_filled(marker, 2.0, color);
+	}
+}
 /// Composite surface fills while preserving theme tokens for each consumer's own background.
 fn opaque_surfaces(mut palette: Palette) -> Palette {
 	let backdrop = palette
@@ -3493,6 +3520,19 @@ mod sign_in_widget_tests {
 			hairline_color(false, Variant::Standard, accent),
 			Color32::from_black_alpha(18),
 		);
+	}
+
+	#[test]
+	fn aurora_active_channel_marker_uses_the_accent_without_changing_flat_presets() {
+		let row = egui::Rect::from_min_size(egui::pos2(10.0, 20.0), egui::vec2(200.0, 34.0));
+		let accent = rgb(0x62e6c4);
+		let (marker, color) = active_channel_marker(Variant::Aurora, row, accent).unwrap();
+		assert_eq!(
+			marker,
+			egui::Rect::from_min_size(egui::pos2(12.0, 28.0), egui::vec2(4.0, 18.0)),
+		);
+		assert_eq!(color, accent);
+		assert_eq!(active_channel_marker(Variant::Standard, row, accent), None);
 	}
 
 	#[test]

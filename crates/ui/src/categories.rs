@@ -999,6 +999,7 @@ impl MessagingUi {
 							};
 							if active {
 								ui.painter().rect_filled(highlight, 8, colors.selected);
+								design::paint_active_channel_marker(ui, highlight);
 							} else if hovered {
 								ui.painter().rect_filled(
 									highlight,

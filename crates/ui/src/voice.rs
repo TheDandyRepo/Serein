@@ -443,6 +443,7 @@ impl MessagingUi {
 		let hovered = viewable && (response.hovered() || response.has_focus());
 		if selected {
 			ui.painter().rect_filled(row, 8, colors.selected);
+			crate::design::paint_active_channel_marker(ui, row);
 		} else if hovered {
 			ui.painter()
 				.rect_filled(row, 8, crate::design::row_highlight(ui, colors.hover, 1.0));
