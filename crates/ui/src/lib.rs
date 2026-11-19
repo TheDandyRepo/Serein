@@ -621,7 +621,7 @@ fn composer_cap(
 	colors: &design::Palette,
 	add_contents: impl FnOnce(&mut egui::Ui),
 ) -> egui::Rect {
-	design::glass_frame(
+	let response = design::glass_frame(
 		ui,
 		design::mix(colors.raised, colors.base, 0.45),
 		egui::Margin {
@@ -640,9 +640,9 @@ fn composer_cap(
 	.show(ui, |ui| {
 		ui.set_min_width((ui.available_width()).max(0.0));
 		ui.horizontal(|ui| add_contents(ui));
-	})
-	.response
-	.rect
+	});
+	design::paint_composer_context_marker(ui, response.response.rect);
+	response.response.rect
 }
 
 fn mention_switch(ui: &mut egui::Ui, colors: &design::Palette, on: &mut bool) {

@@ -1001,6 +1001,31 @@ pub(crate) fn paint_active_channel_marker(ui: &egui::Ui, row: egui::Rect) {
 		ui.painter().rect_filled(marker, 2.0, color);
 	}
 }
+
+/// Geometry for the compact Aurora marker that identifies a reply/edit context above the draft.
+fn composer_context_marker(
+	variant: Variant,
+	frame: egui::Rect,
+	accent: Color32,
+) -> Option<(egui::Rect, Color32)> {
+	if variant != Variant::Aurora {
+		return None;
+	}
+	Some((
+		egui::Rect::from_center_size(
+			egui::pos2(frame.left() + 9.5, frame.center().y),
+			egui::vec2(3.0, 16.0),
+		),
+		accent,
+	))
+}
+
+/// Paint the Aurora-only context marker inside the reply/edit cap.
+pub(crate) fn paint_composer_context_marker(ui: &egui::Ui, frame: egui::Rect) {
+	if let Some((marker, color)) = composer_context_marker(variant(), frame, palette(ui).accent) {
+		ui.painter().rect_filled(marker, 1.5, color);
+	}
+}
 /// Composite surface fills while preserving theme tokens for each consumer's own background.
 fn opaque_surfaces(mut palette: Palette) -> Palette {
 	let backdrop = palette
@@ -3533,6 +3558,20 @@ mod sign_in_widget_tests {
 		);
 		assert_eq!(color, accent);
 		assert_eq!(active_channel_marker(Variant::Standard, row, accent), None);
+	}
+
+	#[test]
+	fn aurora_composer_context_marker_uses_the_accent_without_changing_other_presets() {
+		let frame = egui::Rect::from_min_size(egui::pos2(10.0, 20.0), egui::vec2(400.0, 38.0));
+		let accent = rgb(0x62e6c4);
+		let (marker, color) = composer_context_marker(Variant::Aurora, frame, accent).unwrap();
+		assert_eq!(
+			marker,
+			egui::Rect::from_min_size(egui::pos2(18.0, 31.0), egui::vec2(3.0, 16.0)),
+		);
+		assert_eq!(color, accent);
+		assert_eq!(composer_context_marker(Variant::Standard, frame, accent), None);
+		assert_eq!(composer_context_marker(Variant::Nightfall, frame, accent), None);
 	}
 
 	#[test]
